@@ -16,11 +16,17 @@ jobs:
       - name: Configurar Git
         run: git config --global --add safe.directory /github/workspace
 
+      - name: Verificar Archivos Subidos
+        run: |
+          ls -la
+          if [ ! -f "tesseract-main.zip" ]; then echo "Error: tesseract-main.zip no encontrado"; exit 1; fi
+          if [ ! -f "tesseract-ocr-3.02.spa.zip" ]; then echo "Error: tesseract-ocr-3.02.spa.zip no encontrado"; exit 1; fi
+
       - name: Descomprimir Tesseract Source
         run: unzip -o tesseract-main.zip -d tesseract-main
 
-      - name: Extraer Datos de Idioma Español
-        run: tar -xvf tesseract-ocr-3.02.spa.tar -C tesseract-main/tessdata
+      - name: Extraer Datos de Idioma Español desde ZIP
+        run: unzip -o tesseract-ocr-3.02.spa.zip -d tesseract-main/tessdata
 
       - name: Instalar Dependencias
         run: |
