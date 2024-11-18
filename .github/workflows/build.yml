@@ -25,6 +25,9 @@ jobs:
       - name: Descomprimir Tesseract Source
         run: unzip -o tesseract-main.zip -d tesseract-main
 
+      - name: Listar Archivos Descomprimidos
+        run: ls -la tesseract-main
+
       - name: Extraer Datos de Idioma Español desde ZIP
         run: unzip -o tesseract-ocr-3.02.spa.zip -d tesseract-main/tessdata
 
@@ -37,7 +40,8 @@ jobs:
       - name: Compilar Tesseract
         run: |
           cd tesseract-main
-          mkdir build
+          if [ -d "tesseract-main" ]; then cd tesseract-main; fi
+          mkdir -p build
           cd build
           cmake ..
           make -j$(nproc)
