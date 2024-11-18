@@ -13,19 +13,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Unzip Tesseract Source
-        run: unzip tesseract-main.zip -d tesseract-main
+      - name: Configurar Git
+        run: git config --global --add safe.directory /github/workspace
 
-      - name: Extract Spanish Language Data
+      - name: Descomprimir Tesseract Source
+        run: unzip -o tesseract-main.zip -d tesseract-main
+
+      - name: Extraer Datos de Idioma Español
         run: tar -xvf tesseract-ocr-3.02.spa.tar -C tesseract-main/tessdata
 
-      - name: Install Dependencies
+      - name: Instalar Dependencias
         run: |
           sudo apt update
           sudo apt install -y g++ make autoconf libtool pkg-config \
             libpng-dev libjpeg-dev libtiff-dev zlib1g-dev libicu-dev cmake
 
-      - name: Build Tesseract
+      - name: Compilar Tesseract
         run: |
           cd tesseract-main
           mkdir build
@@ -33,7 +36,10 @@ jobs:
           cmake ..
           make -j$(nproc)
 
-      - name: Upload Tesseract Binary
+      - name: Verificar la Instalación
+        run: tesseract-main/build/bin/tesseract --version
+
+      - name: Subir el Binario Compilado
         uses: actions/upload-artifact@v3
         with:
           name: tesseract-bin
