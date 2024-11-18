@@ -10,19 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Paso 1: Checkout del código
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
+      # Paso 2: Clonar el repositorio de Tesseract
       - name: Clonar Repositorio Tesseract
         run: |
           git clone --depth 1 --recurse-submodules https://github.com/tesseract-ocr/tesseract.git tesseract-main
 
+      # Paso 3: Verificar Archivos Descomprimidos
       - name: Listar Archivos Descomprimidos
         run: ls -la tesseract-main
 
+      # Paso 4: Extraer datos del idioma español desde el archivo ZIP
       - name: Extraer Datos de Idioma Español desde ZIP
         run: unzip -o tesseract-ocr-3.02.spa.zip -d tesseract-main/tessdata
 
+      # Paso 5: Instalar dependencias necesarias
       - name: Instalar Dependencias
         run: |
           sudo apt update
@@ -30,6 +35,7 @@ jobs:
             libpng-dev libjpeg-dev libtiff-dev zlib1g-dev libicu-dev cmake libleptonica-dev \
             libpango1.0-dev libcairo2-dev libpangocairo-1.0-0
 
+      # Paso 6: Compilar Tesseract
       - name: Compilar Tesseract
         run: |
           cd tesseract-main
@@ -38,11 +44,13 @@ jobs:
           cmake ..
           make -j$(nproc)
 
+      # Paso 7: Verificar la instalación de Tesseract
       - name: Verificar la Instalación
         run: tesseract-main/build/bin/tesseract --version
 
+      # Paso 8: Subir el binario compilado como artefacto
       - name: Subir el Binario Compilado
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: tesseract-bin
           path: tesseract-main/build/bin/tesseract
