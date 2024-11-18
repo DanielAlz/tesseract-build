@@ -1,0 +1,40 @@
+name: Compilar Tesseract
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Unzip Tesseract Source
+        run: unzip tesseract-main.zip -d tesseract-main
+
+      - name: Extract Spanish Language Data
+        run: tar -xvf tesseract-ocr-3.02.spa.tar -C tesseract-main/tessdata
+
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y g++ make autoconf libtool pkg-config \
+            libpng-dev libjpeg-dev libtiff-dev zlib1g-dev libicu-dev cmake
+
+      - name: Build Tesseract
+        run: |
+          cd tesseract-main
+          mkdir build
+          cd build
+          cmake ..
+          make -j$(nproc)
+
+      - name: Upload Tesseract Binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: tesseract-bin
+          path: tesseract-main/build/bin/tesseract
