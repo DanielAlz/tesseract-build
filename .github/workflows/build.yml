@@ -28,6 +28,12 @@ jobs:
       - name: Listar Archivos Descomprimidos
         run: ls -la tesseract-main
 
+      - name: Detectar Directorio Correcto
+        run: |
+          if [ -d "tesseract-main/tesseract-main" ]; then
+            mv tesseract-main/tesseract-main/* tesseract-main/
+          fi
+
       - name: Extraer Datos de Idioma Español desde ZIP
         run: unzip -o tesseract-ocr-3.02.spa.zip -d tesseract-main/tessdata
 
@@ -40,7 +46,6 @@ jobs:
       - name: Compilar Tesseract
         run: |
           cd tesseract-main
-          if [ -d "tesseract-main" ]; then cd tesseract-main; fi
           mkdir -p build
           cd build
           cmake ..
