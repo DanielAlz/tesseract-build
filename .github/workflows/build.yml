@@ -25,19 +25,11 @@ jobs:
       - name: Descomprimir Tesseract Source
         run: unzip -o tesseract-main.zip -d tesseract-main
 
-      - name: Listar Archivos Descomprimidos
+      - name: Detectar el Directorio que Contiene CMakeLists.txt
         run: |
-          echo "Contenido de tesseract-main:"
-          ls -la tesseract-main
-
-      - name: Ajustar Directorio si es Necesario
-        run: |
-          if [ -d "tesseract-main/tesseract-main" ]; then
-            echo "Corrigiendo estructura de directorio..."
-            mv tesseract-main/tesseract-main/* tesseract-main/
-          else
-            echo "Estructura correcta, no es necesario mover."
-          fi
+          CMAKE_DIR=$(find tesseract-main -name "CMakeLists.txt" -exec dirname {} \;)
+          echo "Directorio encontrado: $CMAKE_DIR"
+          mv $CMAKE_DIR/* tesseract-main/
 
       - name: Extraer Datos de Idioma Español desde ZIP
         run: unzip -o tesseract-ocr-3.02.spa.zip -d tesseract-main/tessdata
