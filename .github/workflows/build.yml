@@ -26,13 +26,17 @@ jobs:
         run: unzip -o tesseract-main.zip -d tesseract-main
 
       - name: Listar Archivos Descomprimidos
-        run: ls -la tesseract-main
+        run: |
+          echo "Contenido de tesseract-main:"
+          ls -la tesseract-main
 
-      - name: Detectar Directorio Correcto
+      - name: Ajustar Directorio si es Necesario
         run: |
           if [ -d "tesseract-main/tesseract-main" ]; then
-            rm -rf tesseract-main/tesseract-main/*
+            echo "Corrigiendo estructura de directorio..."
             mv tesseract-main/tesseract-main/* tesseract-main/
+          else
+            echo "Estructura correcta, no es necesario mover."
           fi
 
       - name: Extraer Datos de Idioma Español desde ZIP
