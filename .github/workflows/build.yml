@@ -41,13 +41,22 @@ jobs:
     - name: Extraer Datos de Idioma Español desde ZIP
       run: unzip tesseract-ocr-3.02.spa.zip -d tesseract-main/tessdata
 
-    # Paso 8: Instalar Dependencias
+    # Paso 8: Actualizar y configurar los repositorios antes de instalar dependencias
+    - name: Actualizar repositorios y dependencias
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y software-properties-common
+        sudo add-apt-repository universe
+        sudo apt-get update -y
+
+    # Paso 9: Instalar Dependencias
     - name: Instalar Dependencias
-      run: sudo apt-get update && sudo apt-get install -y \
+      run: |
+        sudo apt-get update -y && sudo apt-get install -y \
         build-essential cmake pkg-config libpng-dev libjpeg-dev libtiff-dev zlib1g-dev \
         libicu-dev libpango1.0-dev libcairo2-dev
 
-    # Paso 9: Compilar Leptonica
+    # Paso 10: Compilar Leptonica
     - name: Compilar Leptonica
       run: |
         cd leptonica/leptonica-1.85.0
@@ -56,7 +65,7 @@ jobs:
         make -j$(nproc)
         sudo make install
 
-    # Paso 10: Compilar Tesseract
+    # Paso 11: Compilar Tesseract
     - name: Compilar Tesseract
       run: |
         cd tesseract-main
@@ -65,17 +74,17 @@ jobs:
         make -j$(nproc)
         sudo make install
 
-    # Paso 11: Verificar la instalación
+    # Paso 12: Verificar la instalación
     - name: Verificar la instalación
       run: tesseract --version
 
-    # Paso 12: Subir el binario compilado como artefacto
+    # Paso 13: Subir el binario compilado como artefacto
     - name: Subir el Binario Compilado
       uses: actions/upload-artifact@v3
       with:
         name: tesseract-bin
         path: /usr/local/bin/tesseract
 
-    # Paso 13: Completar job
+    # Paso 14: Completar job
     - name: Complete job
       run: echo "Compilación finalizada con éxito."
