@@ -2,55 +2,69 @@ name: Compilar Tesseract
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Paso 1: Checkout del código
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      # Paso 2: Clonar el repositorio de Tesseract
-      - name: Clonar Repositorio Tesseract
-        run: |
-          git clone --depth 1 --recurse-submodules https://github.com/tesseract-ocr/tesseract.git tesseract-main
+    - name: Configurar Git
+      run: |
+        git config --global user.email "tu-email@example.com"
+        git config --global user.name "tu-nombre"
 
-      # Paso 3: Verificar Archivos Descomprimidos
-      - name: Listar Archivos Descomprimidos
-        run: ls -la tesseract-main
+    # Descomprimir Tesseract Source
+    - name: Descomprimir Tesseract
+      run: unzip tesseract-main.zip -d tesseract-main
 
-      # Paso 4: Extraer datos del idioma español desde el archivo ZIP
-      - name: Extraer Datos de Idioma Español desde ZIP
-        run: unzip -o tesseract-ocr-3.02.spa.zip -d tesseract-main/tessdata
+    # Verificar archivos descomprimidos
+    - name: Listar Archivos Tesseract
+      run: ls -la tesseract-main
 
-      # Paso 5: Instalar dependencias necesarias
-      - name: Instalar Dependencias
-        run: |
-          sudo apt update
-          sudo apt install -y g++ make autoconf libtool pkg-config \
-            libpng-dev libjpeg-dev libtiff-dev zlib1g-dev libicu-dev cmake libleptonica-dev \
-            libpango1.0-dev libcairo2-dev libpangocairo-1.0-0
+    # Extraer Leptonica
+    - name: Extraer Leptonica
+      run: tar -xvf leptonica-1.85.0.tar.gz
 
-      # Paso 6: Compilar Tesseract
-      - name: Compilar Tesseract
-        run: |
-          cd tesseract-main
-          mkdir -p build
-          cd build
-          cmake ..
-          make -j$(nproc)
+    # Instalar Dependencias
+    - name: Instalar Dependencias
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake pkg-config libpng-dev libjpeg-dev libtiff-dev zlib1g-dev libicu-dev
 
-      # Paso 7: Verificar la instalación de Tesseract
-      - name: Verificar la Instalación
-        run: tesseract-main/build/bin/tesseract --version
+    # Compilar Leptonica
+    - name: Compilar Leptonica
+      run: |
+        cd leptonica-1.85.0
+        mkdir build && cd build
+        cmake ..
+        make -j$(nproc)
+        sudo make install
 
-      # Paso 8: Subir el binario compilado como artefacto
-      - name: Subir el Binario Compilado
-        uses: actions/upload-artifact@v4
-        with:
-          name: tesseract-bin
-          path: tesseract-main/build/bin/tesseract
+    # Extraer Datos del Idioma Español
+    - name: Extraer Idioma Español
+      run: unzip tesseract-ocr-3.02.spa.zip -d tesseract-main/tessdata
+
+    # Compilar Tesseract
+    - name: Compilar Tesseract
+      run: |
+        cd tesseract-main
+        mkdir build && cd build
+        cmake ..
+        make -j$(nproc)
+        sudo make install
+
+    # Verificar la Instalación
+    - name: Verificar la Instalación
+      run: tesseract --version
+
+    # Subir el binario compilado como artefacto
+    - name: Subir el Binario Compilado
+      uses: actions/upload-artifact@v3
+      with:
+        name: tesseract-bin
+        path: /usr/local/bin/tesseract
