@@ -38,7 +38,8 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y g++ make autoconf libtool pkg-config \
-            libpng-dev libjpeg-dev libtiff-dev zlib1g-dev libicu-dev cmake
+            libpng-dev libjpeg-dev libtiff-dev zlib1g-dev libicu-dev cmake \
+            libleptonica-dev
 
       - name: Compilar Tesseract
         run: |
