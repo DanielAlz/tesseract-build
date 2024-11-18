@@ -17,46 +17,39 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Paso 2: Verificar los archivos subidos
-    - name: Listar archivos en el repositorio
+    # Paso 2: Listar archivos en el directorio raíz del repositorio
+    - name: Listar archivos en el directorio raíz
       run: ls -la
 
     # Paso 3: Descomprimir Tesseract Source
     - name: Descomprimir Tesseract
-      run: unzip tesseract-main.zip -d tesseract-main
+      run: unzip tesseract-main.zip -d .
 
-    # Paso 4: Crear el directorio antes de extraer Leptonica
+    # Paso 4: Verificar que el archivo CMakeLists.txt esté presente
+    - name: Verificar Tesseract Source
+      run: ls -la tesseract-main
+
+    # Paso 5: Crear el directorio para Leptonica
     - name: Crear directorio para Leptonica
       run: mkdir -p leptonica
 
-    # Paso 5: Descomprimir Leptonica
+    # Paso 6: Descomprimir Leptonica
     - name: Descomprimir Leptonica
       run: tar -xvzf leptonica-1.85.0.tar.gz -C leptonica
-
-    # Paso 6: Verificar que se haya descomprimido correctamente
-    - name: Listar archivos descomprimidos
-      run: ls -la leptonica
 
     # Paso 7: Extraer los datos del idioma español
     - name: Extraer Datos de Idioma Español desde ZIP
       run: unzip tesseract-ocr-3.02.spa.zip -d tesseract-main/tessdata
 
-    # Paso 8: Actualizar y configurar los repositorios antes de instalar dependencias
-    - name: Actualizar repositorios y dependencias
+    # Paso 8: Instalar dependencias
+    - name: Actualizar repositorios e instalar dependencias
       run: |
         sudo apt-get update -y
-        sudo apt-get install -y software-properties-common
-        sudo add-apt-repository universe
-        sudo apt-get update -y
-
-    # Paso 9: Instalar Dependencias
-    - name: Instalar Dependencias
-      run: |
-        sudo apt-get update -y && sudo apt-get install -y \
+        sudo apt-get install -y \
         build-essential cmake pkg-config libpng-dev libjpeg-dev libtiff-dev zlib1g-dev \
         libicu-dev libpango1.0-dev libcairo2-dev
 
-    # Paso 10: Compilar Leptonica
+    # Paso 9: Compilar Leptonica
     - name: Compilar Leptonica
       run: |
         cd leptonica/leptonica-1.85.0
@@ -65,26 +58,23 @@ jobs:
         make -j$(nproc)
         sudo make install
 
-    # Paso 11: Compilar Tesseract
+    # Paso 10: Compilar Tesseract
     - name: Compilar Tesseract
       run: |
         cd tesseract-main
+        ls -la  # Verificar el contenido del directorio
         mkdir build && cd build
         cmake ..
         make -j$(nproc)
         sudo make install
 
-    # Paso 12: Verificar la instalación
-    - name: Verificar la instalación
+    # Paso 11: Verificar la instalación
+    - name: Verificar la instalación de Tesseract
       run: tesseract --version
 
-    # Paso 13: Subir el binario compilado como artefacto
+    # Paso 12: Subir el binario compilado como artefacto
     - name: Subir el Binario Compilado
       uses: actions/upload-artifact@v3
       with:
         name: tesseract-bin
         path: /usr/local/bin/tesseract
-
-    # Paso 14: Completar job
-    - name: Complete job
-      run: echo "Compilación finalizada con éxito."
