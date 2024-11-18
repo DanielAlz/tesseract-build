@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Paso 1: Configurar GitHub Actions
+    # Paso 1: Configurar GitHub Actions con la nueva versión de checkout
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4  # Actualización a v4 para Node.js 20
 
     # Paso 2: Listar archivos en el directorio raíz del repositorio
     - name: Listar archivos en el directorio raíz
@@ -62,7 +62,6 @@ jobs:
     - name: Compilar Tesseract
       run: |
         cd tesseract-main
-        ls -la  # Verificar el contenido del directorio
         mkdir build && cd build
         cmake ..
         make -j$(nproc)
@@ -72,9 +71,9 @@ jobs:
     - name: Verificar la instalación de Tesseract
       run: tesseract --version
 
-    # Paso 12: Subir el binario compilado como artefacto
+    # Paso 12: Subir el binario compilado como artefacto con la nueva versión
     - name: Subir el Binario Compilado
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4  # Actualización a v4
       with:
         name: tesseract-bin
         path: /usr/local/bin/tesseract
