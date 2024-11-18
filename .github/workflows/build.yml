@@ -13,23 +13,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Configurar Git
-        run: git config --global --add safe.directory /github/workspace
-
-      - name: Verificar Archivos Subidos
+      - name: Clonar Repositorio Tesseract
         run: |
-          ls -la
-          if [ ! -f "tesseract-main.zip" ]; then echo "Error: tesseract-main.zip no encontrado"; exit 1; fi
-          if [ ! -f "tesseract-ocr-3.02.spa.zip" ]; then echo "Error: tesseract-ocr-3.02.spa.zip no encontrado"; exit 1; fi
+          git clone --depth 1 --recurse-submodules https://github.com/tesseract-ocr/tesseract.git tesseract-main
 
-      - name: Descomprimir Tesseract Source
-        run: unzip -o tesseract-main.zip -d tesseract-main
-
-      - name: Detectar el Directorio que Contiene CMakeLists.txt
-        run: |
-          CMAKE_DIR=$(find tesseract-main -name "CMakeLists.txt" -exec dirname {} \;)
-          echo "Directorio encontrado: $CMAKE_DIR"
-          mv $CMAKE_DIR/* tesseract-main/
+      - name: Listar Archivos Descomprimidos
+        run: ls -la tesseract-main
 
       - name: Extraer Datos de Idioma Español desde ZIP
         run: unzip -o tesseract-ocr-3.02.spa.zip -d tesseract-main/tessdata
@@ -38,8 +27,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y g++ make autoconf libtool pkg-config \
-            libpng-dev libjpeg-dev libtiff-dev zlib1g-dev libicu-dev cmake \
-            libleptonica-dev
+            libpng-dev libjpeg-dev libtiff-dev zlib1g-dev libicu-dev cmake libleptonica-dev
 
       - name: Compilar Tesseract
         run: |
